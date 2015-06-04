@@ -27,6 +27,9 @@ This is a demo application made with [Backbone.Prism](https://github.com/emaphp/
 This application comes with a Procfile by default so it's Heroku-ready. You can also run it using foreman.
 
 <br/>
+> foreman start
+
+<br/>
 ###License
 
 <br/>
