@@ -1,0 +1,33 @@
+{
+  "name": "backbone-prism-todos",
+  "version": "1.0.0",
+  "description": "A Todo application featuring Backbone.Prism",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "postinstall": "echo postinstall time; bower install && gulp build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.com:emaphp/backbone-prism-todos.git"
+  },
+  "keywords": [
+    "backbone",
+    "prism",
+    "todos"
+  ],
+  "author": "Emmanuel Antico <emmanuel.antico@gmail.com>",
+  "license": "Apache License 2.0",
+  "dependencies": {
+    "browserify": "10.2.1",
+    "browserify-global-shim": "1.0.0",
+    "express": "4.11.1",
+    "express-handlebars": "1.1.0",
+    "gulp": "3.8.11",
+    "gulp-util": "3.0.4",
+    "pretty-hrtime": "1.0.0",
+    "reactify": "1.1.1",
+    "uglifyify": "3.0.1",
+    "vinyl-source-stream": "1.1.0"
+  }
+}
