@@ -27,4 +27,5 @@ build/Release
 node_modules
 public/bower_components
 public/app.js
+public/app.js.map
 .env
