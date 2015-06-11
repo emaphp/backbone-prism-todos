@@ -1,8 +1,8 @@
 var React = require('react');
-var TodosMixin = require('../mixins/TodosMixin');
+var TodosActions = require('../mixins/TodosActions');
 
 var TodoForm  = React.createClass({
-    mixins: [TodosMixin],
+    mixins: [TodosActions],
 
     getInitialState: function () {
         return {

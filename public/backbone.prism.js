@@ -1,5 +1,5 @@
 //
-// Backbone.Prism - v1.0.0
+// Backbone.Prism - v1.1.0
 // ------------------------
 // Flux-like architecture for Backbone.js
 // Copyright 2015 Emmanuel Antico
@@ -18,7 +18,7 @@
     }
 }(this, function(global, Backbone, _, Flux) {
     var Prism = Backbone.Prism = Backbone.Prism || {};
-    Prism.VERSION = '1.0.0';
+    Prism.VERSION = '1.1.0';
     Prism.extend = Backbone.Model.extend;
 
     //
@@ -54,13 +54,19 @@
     
     // Registers a list of actions in a dispatcher instance
     var register = function (dispatcher, actions) {
-        dispatcher.register((function (payload) {
-            var source = payload.source;
+        this._id  = this._id || _.uniqueId('store');
+        dispatcher.stores[this._id] = dispatcher.stores[this._id] || this;
+
+        return dispatcher.register((function (payload) {
             var action = payload.action;
+            var source = payload.source;
             var type = action.type;
+            var prefix;
 
             if (type.indexOf(':') !== -1) {
-                if (typeof this.name !== 'undefined' && type.split(':')[0] !== this.name) {
+                prefix = type.split(':')[0];
+
+                if (prefix !== '*' && typeof this.name !== 'undefined' && prefix !== this.name) {
                     return;
                 }
 
@@ -107,12 +113,35 @@
     });
     
     //
+    // Prism.Channel
+    // -------------
+    // The Prism.Channel class implements a full messaging API (courtesy of Backbone.Radio).
+
+    Prism.Channel = Prism.Object.extend(_.extend({
+        destroy: function () {
+            this.trigger('destroy');
+            this.off();
+            this.stopListening();
+            this.stopComplying();
+            this.stopReplying();
+            return this;
+        }
+    }, Backbone.Radio.Commands, Backbone.Radio.Requests));
+
+    //
+    // Prism.Events
+    // ------------
+    // The Prism.Events mixin provides the same messaging interface implemented in Prism.Channel.
+
+    Prism.Events = _.extend({}, Backbone.Events, Backbone.Radio.Commands, Backbone.Radio.Requests);
+
+    //
     // Prism.Dispatcher
     // ----------------
-    // The Prism.Dispatcher class extends Flux.Dispatcher adding the handleViewAction and
-    // handleServerAction methods.
+    // The Prism.Dispatcher class extends Flux.Dispatcher adding the handleViewAction and handleServerAction methods.
 
     Prism.Dispatcher = function () {
+        this.stores = {};
         Flux.Dispatcher.prototype.constructor.apply(this, arguments);
     };
 
@@ -120,14 +149,14 @@
 
     _.extend(Prism.Dispatcher.prototype, {
         handleViewAction: function (action) {
-            this.dispatch({
+            return this.dispatch({
                 source: 'view',
                 action: action
             });
         },
 
         handleServerAction: function (action) {
-            this.dispatch({
+            return this.dispatch({
                 source: 'server',
                 action: action
             });
@@ -137,7 +166,7 @@
     //
     // Prism.ViewMutator
     // -----------------
-    // A Prism.ViewMutator instance applies changes to a view options object.
+    // A Prism.ViewMutator instance applies changes to a view configuration object.
     
     var ViewMutator =  Prism.Object.extend({
         // Initializes a ViewMutator instance
@@ -148,7 +177,7 @@
             this.callback = callback;
             
             // On start, apply changes to view but don't trigger an event
-            parent.on('start', this.apply(true));
+            parent.on('start', this.update(true));
         },
         
         // Applies modifications to a view instance
@@ -171,8 +200,7 @@
     //
     // Prism.ViewComparator
     // --------------------
-    // The Prism.ViewComparator class extends Prism.ViewMutator, only modifying the
-    // view comparator.
+    // The Prism.ViewComparator class determines the order to apply to a list of models.
     
     var ViewComparator = ViewMutator.extend({
         apply: function (silent) {
@@ -187,8 +215,7 @@
     //
     // Prism.ViewFilter
     // ----------------
-    // The Prism.ViewFilter class extends Prism.ViewMutator, only modifying the
-    // associated filter.
+    // The Prism.ViewFilter class determines which models are removed from a view.
     
     var ViewFilter = ViewMutator.extend({
         apply: function (silent) {
@@ -202,12 +229,11 @@
     Prism.ViewFilter = ViewFilter;
     
     //
-    // Prism.MutatorMixin
-    // ------------------
-    // The Prism.MutatorMixin includes the methods and properties required by state and
-    // store views.
-    
-    var MutatorMixin = {
+    // ViewBaseMixin
+    // -------------
+    // ViewBaseMixin implements common logic used by Prism.StateView and Prism.StoreView classes.
+
+    var ViewBaseMixin = _.extend({
         mutators: {},
         
         // Returns a new ViewMutator instance
@@ -233,19 +259,59 @@
             });
             
             this.mutators[mutator.cid] = mutator;
+        },
+
+        _isActive: false,
+
+        // Deactivates store event listener
+        sleep: function () {
+            this.stopListening(this.parent, this.options.listenTo);
+            this._isActive = false;
+        },
+
+        // Activates store event listener
+        wakeup: function (sync) {
+            this.listenTo(this.parent, this.options.listenTo, this.sync);
+            this._isActive = true;
+            if (sync === false) return;
+            this.sync();
         }
+    }, Backbone.Events);
+
+    //
+    // BaseMixin
+    // ---------
+    // BaseMixin implements common logic used by Prism.State and Prism.Store classes.
+
+    var BaseMixin = {
+        views: {},
+
+        _isInitialized: false,
+
+        // Initializes children views
+        start: function () {
+            this.trigger('start');
+            this._isInitialized = true;
+        },
+
+        // Obtains a view by its name
+        getView: function (name) {
+            return this.views[name];
+        },
+
+        // Registers a list of methods in a dispatcher instance
+        register: register
     };
-    
-    Prism.MutatorMixin = MutatorMixin;
-    
+
     //
     // Prism.StateView
     // ---------------
     // A Prism.StateView instance keeps track of a Prism.State object.
     
     function StateView (state, options) {
-        this.state = state;
+        this.parent = state;
         this.options = _.extend({}, _.result(this, 'options'), options);
+        this.options.listenTo = this.options.listenTo || 'change';
         this._isInitialized = false;
         
         this.listenTo(state, 'start', function () {
@@ -253,10 +319,7 @@
             this.trigger('start');
             
             // Listen for changes
-            this.listenTo(state, this.options.listenTo ? this.options.listenTo : 'change', this.sync);
-            
-            // Synchronize against state
-            this.sync();
+            this.wakeup();
             this._isInitialized = true;
         });
         
@@ -264,52 +327,56 @@
     }
     
     // Include additional mixins
-    _.extend(StateView.prototype, Backbone.Events, Backbone.Radio.Commands, Backbone.Radio.Requests, MutatorMixin, {
-        sync: function (state) {
-            this.attrs = _.extend({cid: this.state.cid}, this.state.attributes);
-            this.trigger('sync', state);
+    _.extend(StateView.prototype, ViewBaseMixin, {
+        initialize: function () {},
+
+        sync: function () {
+            this.attributes = _.extend({cid: this.parent.cid}, this.parent.attributes);
+            this.trigger('sync');
         },
         
         toJSON: function () {
-            return _.extend({cid: this.state.cid}, this.attrs);
+            return _.extend({cid: this.parent.cid}, this.attributes);
         },
         
         destroy: destroy
     });
     
+    StateView.extend = Backbone.Model.extend;
     Prism.StateView = StateView;
     
     //
     // Prism.State
     // -----------
     // The Prism.State class is a Backbone.Model subclass adding 'viewable' behavior.
-    
-    var BaseMixin = {
-        views: {},
-        
-        _isInitialized: false,
-        
-        // Initializes children views
-        start: function () {
-            this.trigger('start');
-            this._isInitialized = true;
-        },
-        
-        // Obtains a view by its name
-        getView: function (name) {
-            return this.views[name];
-        },
-        
-        // Registers a list of methods in a dispatcher instance
-        register: register,
-    };
-    
+
     Prism.StateMixin = _.extend({
+        constructor: function (attributes, options) {
+            var attrs = attributes || {};
+            options = options || {};
+            this.cid = _.uniqueId('c');
+            this.attributes = {};
+            this.views = {};
+            if (options.collection) this.collection = options.collection;
+            if (options.parse) attrs = this.parse(attrs, options) || {};
+            attrs = _.defaults({}, attrs, _.result(this, 'defaults'));
+            this.set(attrs, options);
+            this.changed = {};
+            this.initialize.apply(this, arguments);
+        },
+
         // Returns a new StateView instance
         createView: function (options) {
+            options = options || {};
             var view = new StateView(this, options);
             view.name = options.name ? options.name : _.uniqueId('view');
             this.views[view.name] = view;
+
+            // Remove view when destroyed
+            this.listenTo(view, 'destroy', function () {
+                delete this.views[view.name];
+            });
+
             return view;
         },
         
@@ -322,6 +389,12 @@
             var view = new StateView(this, {});
             view.name = 'default';
             this.views.default = view;
+
+            // Remove view when destroyed
+            this.listenTo(view, 'destroy', function () {
+                delete this.views[view.name];
+            });
+
             return view;
         }
     }, BaseMixin);
@@ -335,22 +408,20 @@
     // A Prism.StoreView instance keeps track of a Prism.Store object.
 
     function StoreView (store, options) {
-        this.store = store;
+        this.parent = store;
         this.models = [];
         this.length = 0;
         this._isInitialized = false;
         this.options = _.extend({}, _.result(this, 'options'), options);
+        this.options.listenTo = this.options.listenTo || 'add remove change reset';
         
         // Initialize with parent store
         this.listenTo(store, 'start', function () {
             // Initialize mutators
             this.trigger('start');
-            
-            // Listen for changes
-            this.listenTo(store, this.options.listenTo ? this.options.listenTo : 'add change remove', this.sync);
 
             // Synchronize models
-            this.sync();
+            this.wakeup();
             this._isInitialized = true;
         });
         
@@ -359,12 +430,12 @@
     }
 
     // Include additional mixins
-    _.extend(StoreView.prototype, Backbone.Events, Backbone.Radio.Commands, Backbone.Radio.Requests, MutatorMixin, {
+    _.extend(StoreView.prototype, ViewBaseMixin, {
         initialize: function () {},
         
         // Synchronizes models against the store
-        sync: function (state) {
-            this.models = _.clone(this.store.models);
+        sync: function () {
+            this.models = _.clone(this.parent.models);
             
             // Apply default filter
             if (this.options.filter) {
@@ -381,13 +452,24 @@
             // Apply additional filters
             if (this.options.filters) {
                 _.each(this.options.filters, (function (filter) {
-                    this.models = this.filter(filter);
+                    if (_.isFunction(filter)) {
+                        this.models = this.filter(filter);
+                    } else if (_.isObject()) {
+                        var matches = _.matches(filter);
+                        this.models = this.filter(function (model) {
+                            return matches(model.attributes);
+                        });
+                    }
                 }).bind(this));
             }
             
             // Sort models
             if (this.options.comparator) {
-                this.models.sort(_.bind(this.options.comparator, this));
+                if (_.isString(this.options.comparator) || this.options.comparator.length === 1) {
+                    this.models = this.sortBy(this.options.comparator, this);
+                } else {
+                    this.models.sort(_.bind(this.options.comparator, this));
+                }
             }
 
             // Update length
@@ -411,7 +493,7 @@
             this.size = this.models.length;
             
             // Update associated components
-            this.trigger('sync', state);
+            this.trigger('sync');
         },
 
         // Returns a JSON representation of a store
@@ -465,6 +547,7 @@
         };
     });
 
+    StoreView.extend = Backbone.Model.extend;
     Prism.StoreView = StoreView;
 
     //
@@ -473,8 +556,19 @@
     // The Prism.Store class is a Backbone.Collection subclass adding 'viewable' behavior.
 
     Prism.StoreMixin = _.extend({
+        constructor: function (models, options) {
+            options = options || {};
+            if (options.model) this.model = options.model;
+            if (options.comparator !== void 0) this.comparator = options.comparator;
+            this._reset();
+            this.views = {};
+            this.initialize.apply(this, arguments);
+            if (models) this.reset(models, _.extend({silent: true}, options));
+        },
+
         // Generates a new StoreView instance
         createView: function(options) {
+            options = options || {};
             // Create view instance
             var view = new StoreView(this, options);
             view.name = options.name ? options.name : _.uniqueId('view');
@@ -512,8 +606,8 @@
     //
     // Prism.ViewMixin
     // ---------------
-    // The Prism.ViewMixin includes additional methods for listening sync events
-    // triggered by a state/store view. It also supports state transformations.
+    // The Prism.ViewMixin includes additional methods for listening sync events triggered by views.
+    // It also supports state transformations.
     
     Prism.ViewMixin = _.extend({
         getInitialState: function () {
@@ -540,9 +634,10 @@
             this.stopListening(this.props.view, 'sync');
         },
         
-        // Applies a new state without refreshing
-        applyState: function (state) {
+        // Merges states without refreshing
+        mergeState: function (state, callback) {
             _.extend(this.state, state);
+            if (callback) callback();
         }
     }, Backbone.Events);
 

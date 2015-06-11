@@ -10,6 +10,7 @@ var SearchBar = React.createClass({
 
     componentDidMount: function () {
         var view = this.props.view;
+        var channel = this.props.channel;
 
         this.filter = view.createFilter(function () {
             var filter = this.state.filter;
@@ -26,7 +27,7 @@ var SearchBar = React.createClass({
         // reduce overhead by composing a callback function with debounce
         this.inputCallback = _.debounce((function () {
             // Reset pagination component
-            view.command('page:reset');
+            channel.command('page:reset');
             this.filter.apply();
         }).bind(this), 200);
     },
@@ -38,7 +39,7 @@ var SearchBar = React.createClass({
 
     handleInputClear: function (e) {
         e.preventDefault();
-        this.props.view.command('page:reset');
+        this.props.channel.command('page:reset');
         this.setState({filter: ''}, this.filter.update());
     },
 

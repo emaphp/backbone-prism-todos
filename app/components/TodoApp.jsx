@@ -12,6 +12,7 @@ var TodoApp = React.createClass({
                 todosStore.start();
             }
         });
+
     },
 
     render: function () {

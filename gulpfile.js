@@ -6,7 +6,12 @@ var gulp = require('gulp'),
 	reactify = require('reactify'),
 	uglifyify = require('uglifyify'),
 	source = require('vinyl-source-stream'),
-	path = require('path');
+	path = require('path'),
+    notify = require('gulp-notify'),
+    exorcist = require('exorcist'),
+    gulpif = require('gulp-if'),
+    watchify = require('watchify'),
+    del = require('del');
 
 // Logger
 var bundleLogger = (function() {
@@ -28,6 +33,13 @@ var bundleLogger = (function() {
 
 // Error handler
 var errorHandler = function () {
+    var args = Array.prototype.slice.call(arguments);
+
+    notify.onError({
+        title: "Compilation error",
+        message: "<%= error.message %>"
+    }).apply(this, args);
+
     this.emit('end');
 };
 
@@ -51,7 +63,7 @@ var config = {
 };
 
 // Bundler
-var bundlerGenerator = function (callback) {
+var bundlerGenerator = function (watch, callback) {
 	var bundleQueue = config.apps.length;
 
 	return function (app) {
@@ -60,10 +72,15 @@ var bundlerGenerator = function (callback) {
 		var options = {
 			fullPaths: false,
 			entries: input,
-			transform: [reactify, globalShim, uglifyify],
+			transform: watch ? [reactify, globalShim] : [reactify, globalShim, uglifyify],
 			extensions: ['.jsx'],
-			debug: false
+			debug: watch
 		};
+
+        if (watch) {
+            options.cache = {};
+            options.packageCache = {};
+        }
 
         var bundler = browserify(options);
 
@@ -73,10 +90,16 @@ var bundlerGenerator = function (callback) {
             return bundler
                 .bundle()
                 .on('error', errorHandler)
+                .pipe(gulpif(watch, exorcist(output + '.map', null, config.sourceRoot, config.path)))
                 .pipe(source(path.basename(output)))
                 .pipe(gulp.dest(path.dirname(output)))
                 .on('end', reportFinished);
         };
+
+        if (watch) {
+            bundler = watchify(bundler);
+            bundler.on('update', bundle);
+        }
 
         var reportFinished = function() {
             bundleLogger.end(output);
@@ -94,7 +117,16 @@ var bundlerGenerator = function (callback) {
 	};
 };
 
+gulp.task('clean', function() {
+	del('./app.js.map');
+});
+
+gulp.task('default', ['clean'], function (callback) {
+    var browserifyThis = bundlerGenerator(true, callback);
+    config.apps.forEach(browserifyThis);
+});
+
 gulp.task('build', function(callback) {
-    var browserifyThis = bundlerGenerator(callback);
+    var browserifyThis = bundlerGenerator(false, callback);
     config.apps.forEach(browserifyThis);
 });

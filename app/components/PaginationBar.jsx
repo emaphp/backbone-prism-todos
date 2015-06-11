@@ -12,6 +12,7 @@ var PaginationBar = React.createClass({
 
     componentDidMount: function () {
         var view = this.props.view;
+        var channel = this.props.channel;
 
         this.paginator = view.createMutator(function () {
             var page = this.state.page;
@@ -24,11 +25,9 @@ var PaginationBar = React.createClass({
         }, this);
 
         // Reset page number when requested
-        view.comply('page:reset', (function () {
-            // This update will not trigger an update
-            // This avoids generating a double render
-            this.applyState({page: 1});
-            this.paginator.apply(true);
+        channel.comply('page:reset', (function () {
+            // This update will not trigger an update, avoiding a double render
+            this.mergeState({page: 1}, this.paginator.update(true));
         }).bind(this));
     },
 
@@ -40,8 +39,7 @@ var PaginationBar = React.createClass({
         e.preventDefault();
 
         // Update state silently and evaluate mutator
-        this.applyState({page: +e.target.innerHTML});
-        this.paginator.apply();
+        this.mergeState({page: +e.target.innerHTML}, this.paginator.update());
     },
 
     render: function () {

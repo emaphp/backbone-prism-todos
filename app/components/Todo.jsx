@@ -1,8 +1,8 @@
 var React = require('react');
-var TodosMixin = require('../mixins/TodosMixin');
+var TodosActions = require('../mixins/TodosActions');
 
 var Todo = React.createClass({
-    mixins: [TodosMixin],
+    mixins: [TodosActions],
 
     cssClasses: ['low', 'normal', 'high', 'very-high'], // CSS classes
 

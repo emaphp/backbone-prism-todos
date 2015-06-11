@@ -15,7 +15,7 @@ var TodosStore = Prism.Store.extend({
 // Create store instance
 var todosStore = new TodosStore();
 
-// Register actions
+// Register methods
 todosStore.register(dispatcher, {
     'add-item': function (item, options) {
         this.create(item, options);
