@@ -19,6 +19,7 @@
   "author": "Emmanuel Antico <emmanuel.antico@gmail.com>",
   "license": "Apache License 2.0",
   "dependencies": {
+    "babelify": "^6.1.2",
     "bower": "1.4.1",
     "browserify": "10.2.1",
     "browserify-global-shim": "1.0.0",
@@ -31,7 +32,6 @@
     "gulp-notify": "2.2.0",
     "gulp-util": "3.0.4",
     "pretty-hrtime": "1.0.0",
-    "reactify": "1.1.1",
     "uglifyify": "3.0.1",
     "vinyl-source-stream": "1.1.0",
     "watchify": "3.2.2"

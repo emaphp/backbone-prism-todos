@@ -1,11 +1,11 @@
-var React = require('react');
-var Todo = require('./Todo.jsx');
-var Prism = require('backbone.prism');
+import React from 'react';
+import Prism from 'backbone.prism';
+import Todo from './Todo.jsx';
 
-var TodoList = React.createClass({
+export default React.createClass({
     mixins: [Prism.ViewMixin],
 
-    render: function () {
+    render() {
         if (this.state.view.length === 0) {
             return (
                 <div className="blankslate">
@@ -15,7 +15,7 @@ var TodoList = React.createClass({
             );
         }
 
-        var renderer = function (model) {
+        let renderer = model => {
             return <Todo key={model.cid} model={model} />
         };
 
@@ -26,5 +26,3 @@ var TodoList = React.createClass({
         );
     }
 });
-
-module.exports = TodoList;

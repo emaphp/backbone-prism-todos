@@ -1,10 +1,10 @@
-var React = require('react');
-var TodosActions = require('../mixins/TodosActions');
+import React from 'react';
+import TodosActions from '../mixins/TodosActions';
 
-var TodoForm  = React.createClass({
+export default React.createClass({
     mixins: [TodosActions],
 
-    getInitialState: function () {
+    getInitialState() {
         return {
             description: '',
             priority: 1
@@ -15,28 +15,28 @@ var TodoForm  = React.createClass({
     // Handlers
     //
 
-    handleInputDescription: function (e) {
-        var value = $(e.target).val();
+    handleInputDescription(e) {
+        let value = $(e.target).val();
         this.setState({
             description: value
         });
     },
 
-    handleSelectPriority: function(e) {
-        var value = $(e.target).val();
+    handleSelectPriority(e) {
+        let value = $(e.target).val();
         this.setState({
             priority: value
         });
     },
 
-    handleSubmit: function (e) {
+    handleSubmit(e) {
         e.preventDefault();
 
         if (!this.state.description) {
             return;
         }
 
-        var item = {
+        let item = {
             description: this.state.description,
             priority: this.state.priority,
             created_at: (new Date()).getTime(),
@@ -51,7 +51,7 @@ var TodoForm  = React.createClass({
     // Render
     //
 
-    render: function () {
+    render() {
         return (
             <div className="one-third column">
                 <h2 className="form-title">New Task</h2>
@@ -81,5 +81,3 @@ var TodoForm  = React.createClass({
         );
     }
 });
-
-module.exports = TodoForm;

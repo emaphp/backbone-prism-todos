@@ -1,20 +1,18 @@
-var React = require('react');
+import React from 'react';
 
-var OrderOption = React.createClass({
-    handleClick: function (e) {
+export default React.createClass({
+    handleClick(e) {
         e.preventDefault();
         this.props.handler(this.props.field);
     },
 
-    getStatusClass: function () {
+    getStatusClass() {
         return 'status' +  (this.props.selected === this.props.field ? ' status-selected' : '');
     },
 
-    render: function () {
+    render() {
         return (
             <a href="#" className={this.getStatusClass()} onClick={this.handleClick}>{this.props.name}</a>
         );
     }
 });
-
-module.exports = OrderOption;

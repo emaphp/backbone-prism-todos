@@ -1,27 +1,27 @@
-var dispatcher = require('../dispatcher');
+import dispatcher from '../dispatcher';
 
-module.exports = {
-    doAddItem: function(item, options) {
+export default {
+    doAddItem (item, options) {
         dispatcher.handleViewAction({
             type: 'todos:add-item',
             data: item,
-            options: options
+            options
         });
     },
 
-    doRemoveItem: function (id, options) {
+    doRemoveItem (id, options) {
         dispatcher.handleViewAction({
             type: 'todos:remove-item',
             data: id,
-            options: options
+            options
         });
     },
 
-    doSwitchStatus: function (id, options) {
+    doSwitchStatus (id, options) {
         dispatcher.handleViewAction({
             type: 'todos:switch-status',
             data: id,
-            options: options
+            options
         });
     }
 };

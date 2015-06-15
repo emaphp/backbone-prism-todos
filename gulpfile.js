@@ -3,7 +3,6 @@ var gulp = require('gulp'),
 	prettyHrtime = require('pretty-hrtime'),
 	browserify = require('browserify'),
 	browserifyGlobalShim = require('browserify-global-shim'),
-	reactify = require('reactify'),
 	uglifyify = require('uglifyify'),
 	source = require('vinyl-source-stream'),
 	path = require('path'),
@@ -11,6 +10,7 @@ var gulp = require('gulp'),
     exorcist = require('exorcist'),
     gulpif = require('gulp-if'),
     watchify = require('watchify'),
+    babelify = require('babelify'),
     del = require('del');
 
 // Logger
@@ -72,7 +72,7 @@ var bundlerGenerator = function (watch, callback) {
 		var options = {
 			fullPaths: false,
 			entries: input,
-			transform: watch ? [reactify, globalShim] : [reactify, globalShim, uglifyify],
+			transform: watch ? [babelify, globalShim] : [babelify, globalShim, uglifyify],
 			extensions: ['.jsx'],
 			debug: watch
 		};

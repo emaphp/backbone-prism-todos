@@ -1,20 +1,20 @@
-var React = require('react');
-var Prism = require('backbone.prism');
-var SearchBar = require('./SearchBar.jsx');
-var TodoList = require('./TodoList.jsx');
-var StatusBar = require('./StatusBar.jsx');
-var PaginationBar = require('./PaginationBar.jsx');
-var OrderBar = require('./OrderBar.jsx');
-var todosStore = require('../stores/todosStore');
+import React from 'react';
+import Prism from 'backbone.prism';
+import SearchBar from './SearchBar.jsx';
+import TodoList from './TodoList.jsx';
+import StatusBar from './StatusBar.jsx';
+import PaginationBar from './PaginationBar.jsx';
+import OrderBar from './OrderBar.jsx';
+import todosStore from '../stores/todosStore';
 
-var FilteredTodoList = React.createClass({
-    getDefaultProps: function () {
+export default React.createClass({
+    getDefaultProps() {
         return {
             channel: new Prism.Channel()
         };
     },
 
-    getInitialState: function () {
+    getInitialState() {
         return {
             // Default view
             defaultView: todosStore.getDefaultView(),
@@ -26,7 +26,11 @@ var FilteredTodoList = React.createClass({
         };
     },
 
-    render: function () {
+    componentWillUnmount() {
+        this.props.channel.destroy();
+    },
+
+    render() {
         return (
             <div className="two-thirds column">
                 <StatusBar view={this.state.defaultView} mainView={this.state.mainView} channel={this.props.channel} />
@@ -38,5 +42,3 @@ var FilteredTodoList = React.createClass({
         );
     }
 });
-
-module.exports = FilteredTodoList;

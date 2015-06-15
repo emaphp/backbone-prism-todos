@@ -1,22 +1,22 @@
-var React = require('react');
-var Prism = require('backbone.prism');
+import React from 'react';
+import Prism from 'backbone.prism';
 
-var PaginationBar = React.createClass({
+export default React.createClass({
     mixins: [Prism.ViewMixin],
 
-    getInitialState: function () {
+    getInitialState() {
         return {
             page: 1
         };
     },
 
-    componentDidMount: function () {
-        var view = this.props.view;
-        var channel = this.props.channel;
+    componentDidMount() {
+        let view = this.props.view;
+        let channel = this.props.channel;
 
-        this.paginator = view.createMutator(function () {
-            var page = this.state.page;
-            var pageSize = this.props.pageSize;
+        this.paginator = view.createMutator(() => {
+            let page = this.state.page;
+            let pageSize = this.props.pageSize;
 
             return {
                 offset: pageSize * (page - 1),
@@ -25,24 +25,24 @@ var PaginationBar = React.createClass({
         }, this);
 
         // Reset page number when requested
-        channel.comply('page:reset', (function () {
+        channel.comply('page:reset', (() => {
             // This update will not trigger an update, avoiding a double render
             this.mergeState({page: 1}, this.paginator.update(true));
         }).bind(this));
     },
 
-    componentWillUnmount: function () {
+    componentWillUnmount() {
         this.paginator.destroy();
     },
 
-    handlePageClick: function (e) {
+    handlePageClick(e) {
         e.preventDefault();
 
         // Update state silently and evaluate mutator
         this.mergeState({page: +e.target.innerHTML}, this.paginator.update());
     },
 
-    render: function () {
+    render() {
         if (this.props.view.length <= this.props.pageSize) {
             return (
                 <div className="pagination-bar">
@@ -51,9 +51,12 @@ var PaginationBar = React.createClass({
             );
         }
 
-        var pages = Math.ceil(this.props.view.length / this.props.pageSize);
-        var renderer = (function (page) {
-            return <a key={page} href="#" className={'page-option ' + ((page + 1 === this.state.page) ? 'page-selected' : '')} onClick={this.handlePageClick}>{page + 1}</a>
+        let pages = Math.ceil(this.props.view.length / this.props.pageSize);
+        let renderer = (page => {
+            let style = (page + 1 === this.state.page) ? 'page-selected' : '';
+            return (
+                <a key={page} href="#" className={'page-option ' + style} onClick={this.handlePageClick}>{page + 1}</a>
+            );
         }).bind(this);
 
         return (
@@ -63,5 +66,3 @@ var PaginationBar = React.createClass({
         );
     }
 });
-
-module.exports = PaginationBar;

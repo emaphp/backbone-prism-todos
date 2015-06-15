@@ -1,2 +1,2 @@
-var Prism = require('backbone.prism');
-module.exports = new Prism.Dispatcher();
+import Prism from 'backbone.prism';
+export default new Prism.Dispatcher();

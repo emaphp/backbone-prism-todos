@@ -1,37 +1,37 @@
-var Backbone = require('backbone');
-var Prism = require('backbone.prism');
-var dispatcher = require('../dispatcher');
+import Backbone from 'backbone';
+import Prism from 'backbone.prism';
+import dispatcher from '../dispatcher';
 
-var Todo = Backbone.Model.extend({
+let Todo = Backbone.Model.extend({
     localStorage: new Backbone.LocalStorage("Todos"),
 });
 
-var TodosStore = Prism.Store.extend({
+let TodosStore = Prism.Store.extend({
     name: 'todos',
     model: Todo,
     localStorage: new Backbone.LocalStorage("Todos"),
 });
 
 // Create store instance
-var todosStore = new TodosStore();
+let todosStore = new TodosStore();
 
 // Register methods
 todosStore.register(dispatcher, {
-    'add-item': function (item, options) {
+    'add-item' (item, options) {
         this.create(item, options);
     },
 
-    'remove-item': function (id, options) {
-        var model = this.get(id);
+    'remove-item' (id, options) {
+        let model = this.get(id);
         model.destroy(options);
     },
 
-    'switch-status': function (id, options) {
-        var model = this.get(id);
-        var status = !model.get('closed');
+    'switch-status' (id, options) {
+        let model = this.get(id);
+        let status = !model.get('closed');
         model.set('closed', status);
         model.save(options);
     }
 });
 
-module.exports = todosStore;
+export default todosStore;

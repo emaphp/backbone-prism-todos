@@ -1,18 +1,18 @@
-var React = require('react');
-var Prism = require('backbone.prism');
-var StatusOption = require('./StatusOption.jsx');
+import React from 'react';
+import Prism from 'backbone.prism';
+import StatusOption from './StatusOption.jsx';
 
-var StatusBar = React.createClass({
+export default React.createClass({
     mixins: [Prism.ViewMixin],
 
-    getInitialState: function () {
+    getInitialState() {
         return {
             selected: 'all'
         };
     },
 
     // Generates a custom state from the default view
-    transform: function (view) {
+    transform(view) {
         return {
             all: view.length,
             active: view.filter(function (model) {
@@ -24,8 +24,8 @@ var StatusBar = React.createClass({
         };
     },
 
-    componentDidMount: function () {
-        var view = this.props.mainView;
+    componentDidMount() {
+        let view = this.props.mainView;
 
         this.filter = view.createFilter(function () {
             var filter = this.state.selected;
@@ -40,20 +40,20 @@ var StatusBar = React.createClass({
         }, this);
     },
 
-    changeSelected: function (selected) {
+    changeSelected(selected) {
         // Reset paginator component
         this.props.channel.command('page:reset');
 
         // Change current state and then apply the filter mutator
         // All components listening to mainView will then re-render
-        this.setState({selected: selected}, this.filter.update());
+        this.setState({selected}, this.filter.update());
     },
 
-    componentWillUnmount: function () {
+    componentWillUnmount() {
         this.filter.destroy();
     },
 
-    render: function () {
+    render() {
         return (
             <div className="status-bar">
                 <StatusOption key='all' name="All" option="all" handler={this.changeSelected} selected={this.state.selected} total={this.state.all}/>
@@ -63,5 +63,3 @@ var StatusBar = React.createClass({
         );
     }
 });
-
-module.exports = StatusBar;

@@ -1,13 +1,13 @@
-var React = require('react');
-var TodoForm = require('./TodoForm.jsx');
-var FilteredTodoList = require('./FilteredTodoList.jsx');
-var todosStore = require('../stores/todosStore');
+import React from 'react';
+import TodoForm from './TodoForm.jsx';
+import FilteredTodoList from './FilteredTodoList.jsx';
+import todosStore from '../stores/todosStore';
 
-var TodoApp = React.createClass({
-    componentDidMount: function () {
+export default React.createClass({
+    componentDidMount() {
         // Fetch tasks from local storage
         todosStore.fetch({
-            success: function () {
+            success() {
                 // Initialize children views
                 todosStore.start();
             }
@@ -15,7 +15,7 @@ var TodoApp = React.createClass({
 
     },
 
-    render: function () {
+    render() {
         return (
             <div className="columns">
                 <TodoForm />
@@ -24,5 +24,3 @@ var TodoApp = React.createClass({
         );
     }
 });
-
-module.exports = TodoApp;

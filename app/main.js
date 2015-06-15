@@ -1,4 +1,4 @@
-var React = require('react');
-var TodoApp = require('./components/TodoApp.jsx');
+import React from 'react';
+import TodoApp from './components/TodoApp.jsx';
 
 React.render(<TodoApp />, document.getElementById('app'));

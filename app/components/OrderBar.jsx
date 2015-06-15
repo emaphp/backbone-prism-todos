@@ -1,20 +1,20 @@
-var React = require('react');
-var OrderOption = require('./OrderOption.jsx');
+import React from "react";
+import OrderOption from './OrderOption.jsx';
 
-var OrderBar = React.createClass({
-    getInitialState: function () {
+export default React.createClass({
+    getInitialState() {
         return {
             field: 'created_at'
         };
     },
 
-    componentDidMount: function () {
-        var view = this.props.view;
+    componentDidMount() {
+        let view = this.props.view;
 
-        this.comparator = view.createComparator(function () {
-            var field = this.state.field;
+        this.comparator = view.createComparator(() => {
+            let field = this.state.field;
 
-            return function (model1, model2) {
+            return (model1, model2) => {
                 if (field == 'description') {
                     return model2.get(field) < model1.get(field);
                 }
@@ -24,15 +24,15 @@ var OrderBar = React.createClass({
         }, this);
     },
 
-    componentWillUnmount: function () {
+    componentWillUnmount() {
         this.comparator.destroy();
     },
 
-    handleOptionClick: function (field) {
-        this.setState({field: field}, this.comparator.update());
+    handleOptionClick(field) {
+        this.setState({field}, this.comparator.update());
     },
 
-    render: function () {
+    render() {
         return (
             <div className="order-bar">
                 Order by: &nbsp;
@@ -43,5 +43,3 @@ var OrderBar = React.createClass({
         );
     }
 });
-
-module.exports = OrderBar;

@@ -1,22 +1,22 @@
-var React = require('react');
-var _ = require('underscore');
+import React from 'react';
+import _ from 'underscore';
 
-var SearchBar = React.createClass({
-    getInitialState: function () {
+export default React.createClass({
+    getInitialState() {
         return {
             filter: ''
         };
     },
 
-    componentDidMount: function () {
-        var view = this.props.view;
-        var channel = this.props.channel;
+    componentDidMount() {
+        let view = this.props.view;
+        let channel = this.props.channel;
 
-        this.filter = view.createFilter(function () {
-            var filter = this.state.filter;
-            var regex = new RegExp(filter.replace(/([.*+?^${}()|\[\]\/\\])/g, "\\$1"), 'i');
+        this.filter = view.createFilter(() => {
+            let filter = this.state.filter;
+            let regex = new RegExp(filter.replace(/([.*+?^${}()|\[\]\/\\])/g, "\\$1"), 'i');
 
-            return function (model) {
+            return model => {
                 if (filter === '') {
                     return true;
                 }
@@ -25,29 +25,29 @@ var SearchBar = React.createClass({
         }, this);
 
         // reduce overhead by composing a callback function with debounce
-        this.inputCallback = _.debounce((function () {
+        this.inputCallback = _.debounce((() => {
             // Reset pagination component
             channel.command('page:reset');
             this.filter.apply();
         }).bind(this), 200);
     },
 
-    handleInputSearch: function (e) {
-        var value = $(e.target).val();
-        this.setState({filter: value}, this.inputCallback);
+    handleInputSearch(e) {
+        let filter = $(e.target).val();
+        this.setState({filter}, this.inputCallback);
     },
 
-    handleInputClear: function (e) {
+    handleInputClear(e) {
         e.preventDefault();
         this.props.channel.command('page:reset');
         this.setState({filter: ''}, this.filter.update());
     },
 
-    componentWillUnmount: function () {
+    componentWillUnmount() {
         this.filter.destroy();
     },
 
-    render: function () {
+    render() {
         return (
             <div className="flex-table search-bar">
                 <div className="flex-table-item flex-table-item-primary">
@@ -62,5 +62,3 @@ var SearchBar = React.createClass({
         );
     }
 });
-
-module.exports = SearchBar;

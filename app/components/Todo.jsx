@@ -1,26 +1,26 @@
-var React = require('react');
-var TodosActions = require('../mixins/TodosActions');
+import React from 'react';
+import TodosActions from '../mixins/TodosActions';
 
-var Todo = React.createClass({
+export default React.createClass({
     mixins: [TodosActions],
 
     cssClasses: ['low', 'normal', 'high', 'very-high'], // CSS classes
 
     priorities: ['Low', 'Normal', 'High', 'Very High'], // Priorities names
 
-    getPriorityClass: function () {
+    getPriorityClass() {
         return this.cssClasses[this.props.model.priority - 1];
     },
 
-    getPriorityName: function () {
+    getPriorityName() {
         return this.priorities[this.props.model.priority - 1];
     },
 
-    getStatusClass: function () {
+    getStatusClass() {
         return this.props.model.closed ? 'state-closed' : 'state-open';
     },
 
-    getStatusName: function () {
+    getStatusName() {
         return this.props.model.closed ? 'Closed' : 'Active';
     },
 
@@ -28,12 +28,12 @@ var Todo = React.createClass({
     // Handlers
     //
 
-    handleSwitchStatus: function (e) {
+    handleSwitchStatus(e) {
         e.preventDefault();
         return this.doSwitchStatus(this.props.model.id);
     },
 
-    handleRemoveItem: function (e) {
+    handleRemoveItem(e) {
         e.preventDefault();
         this.doRemoveItem(this.props.model.id);
     },
@@ -43,7 +43,7 @@ var Todo = React.createClass({
     //
 
     render: function () {
-        var inlineStyles = {
+        let inlineStyles = {
             'textDecoration': this.props.model.closed ? 'line-through' : 'none'
         };
 
@@ -58,5 +58,3 @@ var Todo = React.createClass({
         );
     }
 });
-
-module.exports = Todo;
