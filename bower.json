@@ -1,6 +1,6 @@
 {
   "name": "backbone-prism-todos",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "authors": [
     "Emmanuel Antico <emmanuel.antico@gmail.com>"
   ],
@@ -26,6 +26,6 @@
     "flux": "2.0.2",
     "react": "0.13.3",
     "octicons": "2.2.3",
-    "backbone.radio": "0.9.0"
+    "backbone.radio": "1.0.0"
   }
 }

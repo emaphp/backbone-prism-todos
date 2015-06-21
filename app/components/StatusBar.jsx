@@ -42,7 +42,7 @@ export default React.createClass({
 
     changeSelected(selected) {
         // Reset paginator component
-        this.props.channel.command('page:reset');
+        this.props.channel.trigger('page:reset');
 
         // Change current state and then apply the filter mutator
         // All components listening to mainView will then re-render

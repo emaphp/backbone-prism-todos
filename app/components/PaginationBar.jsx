@@ -25,7 +25,7 @@ export default React.createClass({
         }, this);
 
         // Reset page number when requested
-        channel.comply('page:reset', (() => {
+        channel.on('page:reset', (() => {
             // This update will not trigger an update, avoiding a double render
             this.mergeState({page: 1}, this.paginator.update(true));
         }).bind(this));

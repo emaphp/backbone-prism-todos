@@ -27,7 +27,7 @@ export default React.createClass({
         // reduce overhead by composing a callback function with debounce
         this.inputCallback = _.debounce((() => {
             // Reset pagination component
-            channel.command('page:reset');
+            channel.trigger('page:reset');
             this.filter.apply();
         }).bind(this), 200);
     },
@@ -39,7 +39,7 @@ export default React.createClass({
 
     handleInputClear(e) {
         e.preventDefault();
-        this.props.channel.command('page:reset');
+        this.props.channel.trigger('page:reset');
         this.setState({filter: ''}, this.filter.update());
     },
 
