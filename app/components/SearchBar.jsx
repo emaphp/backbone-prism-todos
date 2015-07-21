@@ -16,12 +16,7 @@ export default React.createClass({
             let filter = this.state.filter;
             let regex = new RegExp(filter.replace(/([.*+?^${}()|\[\]\/\\])/g, "\\$1"), 'i');
 
-            return model => {
-                if (filter === '') {
-                    return true;
-                }
-                return model.get('description').match(regex);
-            };
+            return model => filter === '' ? true : model.get('description').match(regex);
         }, this);
 
         // reduce overhead by composing a callback function with debounce

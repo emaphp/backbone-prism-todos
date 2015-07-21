@@ -15,22 +15,18 @@ export default React.createClass({
     transform(view) {
         return {
             all: view.length,
-            active: view.filter(function (model) {
-                return !model.get('closed');
-            }).length,
-            closed: view.filter(function (model) {
-                return model.get('closed');
-            }).length
+            active: view.filter(model => !model.get('closed')).length,
+            closed: view.filter(model => model.get('closed')).length
         };
     },
 
     componentDidMount() {
         let view = this.props.mainView;
 
-        this.filter = view.createFilter(function () {
-            var filter = this.state.selected;
+        this.filter = view.createFilter(() => {
+            let filter = this.state.selected;
 
-            return function (model) {
+            return model => {
                 switch (filter) {
                     case 'all': return true;
                     case 'active': return !model.get('closed');
