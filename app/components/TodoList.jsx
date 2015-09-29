@@ -2,11 +2,17 @@ import React from 'react';
 import Prism from 'backbone.prism';
 import Todo from './Todo.jsx';
 
-export default React.createClass({
-    mixins: [Prism.ViewMixin],
-
-    render() {
-        if (this.state.view.length === 0) {
+class TodoList extends React.Component {
+	render() {
+		if (!this.props.view.isInitialized()) {
+			return (
+                <div className="blankslate">
+					Loading data...
+                </div>
+            );
+		}
+		
+        if (this.props.view.length === 0) {
             return (
                 <div className="blankslate">
                     <h3><span className="octicon octicon-beer">&nbsp;</span>Cheers, no tasks</h3>
@@ -16,13 +22,17 @@ export default React.createClass({
         }
 
         let renderer = model => {
-            return <Todo key={model.cid} model={model} />
+            return <Todo channel={this.props.channel} key={model.cid} model={model} />
         };
 
+		let values = this.props.values();
+		
         return (
             <div>
-                {this.state.view.map(renderer)}
+                {values.view.map(renderer)}
             </div>
         );
     }
-});
+}
+
+export default Prism.compose(React, TodoList);

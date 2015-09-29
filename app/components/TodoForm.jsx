@@ -1,34 +1,31 @@
 import React from 'react';
-import TodosActions from '../mixins/TodosActions';
+import TodoActions from '../actions/TodoActions';
+import _ from 'underscore';
 
-export default React.createClass({
-    mixins: [TodosActions],
-
-    getInitialState() {
-        return {
-            description: '',
-            priority: 1
-        };
-    },
-
-    //
-    // Handlers
-    //
-
-    handleInputDescription(e) {
+class TodoForm extends React.Component {
+	constructor(props) {
+		super(props);
+		
+		this.state = {
+			description: '',
+			priority: 1
+		};
+	}
+	
+	handleInputDescription(e) {
         let value = $(e.target).val();
         this.setState({
             description: value
         });
-    },
-
+    }
+    
     handleSelectPriority(e) {
         let value = $(e.target).val();
         this.setState({
             priority: value
         });
-    },
-
+    }
+    
     handleSubmit(e) {
         e.preventDefault();
 
@@ -43,27 +40,26 @@ export default React.createClass({
             closed: false
         };
 
-        this.doAddItem(item);
-        this.setState(this.getInitialState());
-    },
-
-    //
-    // Render
-    //
-
+        TodoActions.addItem(item);
+        this.setState({
+			description: '',
+			priority: 1
+		});
+    }
+    
     render() {
         return (
             <div className="one-third column">
                 <h2 className="form-title">New Task</h2>
-                <form onSubmit={this.handleSubmit}>
+                <form onSubmit={_.bind(this.handleSubmit, this)}>
                     <dl className="form">
                         <dt><label>Description</label></dt>
-                        <dd><input type="text" className="textfield" placeholder="Task Description" value={this.state.description} onChange={this.handleInputDescription}/></dd>
+                        <dd><input type="text" className="textfield" placeholder="Task Description" value={this.state.description} onChange={_.bind(this.handleInputDescription, this)}/></dd>
                     </dl>
                     <dl className="form">
                         <dt><label>Priority</label></dt>
                         <dd>
-                            <select value={this.state.priority} onChange={this.handleSelectPriority}>
+                            <select value={this.state.priority} onChange={_.bind(this.handleSelectPriority, this)}>
                                 <option value="1">Low</option>
                                 <option value="2">Normal</option>
                                 <option value="3">High</option>
@@ -80,4 +76,6 @@ export default React.createClass({
             </div>
         );
     }
-});
+}
+
+export default TodoForm;

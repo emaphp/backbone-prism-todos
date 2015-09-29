@@ -1,21 +1,20 @@
 import React from 'react';
 import TodoForm from './TodoForm.jsx';
 import FilteredTodoList from './FilteredTodoList.jsx';
-import todosStore from '../stores/todosStore';
+import todoStore from '../stores/TodoStore';
 
-export default React.createClass({
-    componentDidMount() {
-        // Fetch tasks from local storage
-        todosStore.fetch({
+class TodoApp extends React.Component {
+	componentDidMount() {
+		// Fetch tasks from local storage
+        todoStore.fetch({
             success() {
                 // Initialize children views
-                todosStore.start();
+                todoStore.start();
             }
         });
-
-    },
-
-    render() {
+	}
+	
+	render() {
         return (
             <div className="columns">
                 <TodoForm />
@@ -23,4 +22,6 @@ export default React.createClass({
             </div>
         );
     }
-});
+}
+
+export default TodoApp;
