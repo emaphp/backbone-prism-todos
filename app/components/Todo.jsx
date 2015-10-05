@@ -29,13 +29,11 @@ class Todo extends React.Component {
     
     handleSwitchStatus(e) {
         e.preventDefault();
-        this.props.channel.trigger('page:reduce', false);
         TodoActions.switchStatus(this.props.model.id);
     }
     
     handleRemoveItem(e) {
         e.preventDefault();
-        this.props.channel.trigger('page:reduce', true);
         TodoActions.removeItem(this.props.model.id);
     }
     

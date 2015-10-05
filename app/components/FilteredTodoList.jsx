@@ -37,7 +37,7 @@ class FilteredTodoList extends React.Component {
             <div className="two-thirds column">
                 <StatusBar view={this.filterView} target={this.statusView} channel={this.channel} />
                 <SearchBar target={this.filterView} channel={this.channel}/>
-                <TodoList view={this.paginatorView} channel={this.channel}/>
+                <TodoList view={this.paginatorView} />
                 <PaginationBar view={this.statusView} target={this.paginatorView} pageSize={this.props.pageSize} channel={this.channel}/>
                 <OrderBar target={this.filterView} />
             </div>

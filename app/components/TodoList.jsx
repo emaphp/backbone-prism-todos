@@ -22,7 +22,7 @@ class TodoList extends React.Component {
         }
 
         let renderer = model => {
-            return <Todo channel={this.props.channel} key={model.cid} model={model} />
+            return <Todo key={model.cid} model={model} />
         };
 
 		let values = this.props.values();

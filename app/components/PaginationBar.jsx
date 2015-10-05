@@ -27,38 +27,22 @@ class PaginationBar extends React.Component {
 
         // Reset page number when requested
         channel.on('page:reset', _.bind(() => this.paginator.update({page: 1}, true), this));
-        
-        // Receives a potential event that could reduce the amount of pages
-        channel.on('page:reduce', _.bind(remove => {
-			let status = channel.request('status:current');
-			let page = this.state.page;
-			
-			//If we're showing 'active' or 'closed' treat the 'switch-status' event as a remove event
-			let total = this.props.view.filter(model => {
-				switch (status) {
-					case 'all':
-					return true;
-					
-					case 'active':
-					remove = true;
-					return !model.get('closed');
-					
-					case 'closed':
-					remove = true;
-					return model.get('closed');
-				}
-			}).length;
-			
-			let pages = Math.ceil((total - (+remove))/ this.props.pageSize);
-			
-			if (page > pages) {
-				//Move to last page
-				//Re-render will be completed after store is modified
-				this.paginator.update({page: pages}, true);
-			}
-        }, this));
-        
+
         this.paginatorCallback = _.bind(() => this.paginator.apply(), this);
+	}
+	
+	totalPages(totalItems, pageSize) {
+		return Math.ceil(totalItems / pageSize);
+	}
+	
+	componentWillReceiveProps(nextProps) {
+		let values = nextProps.values();
+		let pages = this.totalPages(values.view.length, this.props.pageSize);
+		
+		// Check if paginator is out of bounds
+		if (this.state.page > pages) {
+			this.setState({ page: pages }, this.paginatorCallback);
+		}
 	}
 	
 	componentWillUnmount() {
