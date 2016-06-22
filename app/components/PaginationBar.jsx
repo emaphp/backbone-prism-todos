@@ -28,7 +28,7 @@ class PaginationBar extends React.Component {
         let pages = this.paginator.getTotalPages(nextProps.view.length);
 
 		    // Check if paginator is out of bounds
-		    if (this.state.page > pages) {
+		    if (pages > 0 && this.state.page > pages) {
             this.paginator.setPage(pages);
 			      this.setState({ page: pages }, this.paginator.eval());
 		    }
