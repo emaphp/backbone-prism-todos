@@ -1,20 +1,21 @@
-import React from "react";
+import React from 'react';
 import OrderOption from './OrderOption.jsx';
-import _ from 'underscore';
 
 class OrderBar extends React.Component {
-	constructor(props) {
-		super(props);
-		
-		this.state = {
-			field: 'created_at'
-		};
-	}
-	
-	componentWillMount() {
-		let view = this.props.target;
+	  constructor(props) {
+		    super(props);
 
-        this.comparator = view.createComparator(() => {
+		    this.state = {
+			      field: 'created_at'
+		    };
+
+        this.handleOptionClick = this.handleOptionClick.bind(this);
+	  }
+
+	  componentWillMount() {
+		    let view = this.props.orderOn;
+
+        this.comparator = view.createComparator(this, () => {
             let field = this.state.field;
 
             return (model1, model2) => {
@@ -24,26 +25,24 @@ class OrderBar extends React.Component {
 
                 return model2.get(field) > model1.get(field);
             };
-        }, this);
-        
-        this.comparatorCallback = _.bind(() => this.comparator.apply(), this);
-	}
-	
-	componentWillUnmount() {
+        });
+	  }
+
+	  componentWillUnmount() {
         this.comparator.destroy();
     }
-    
+
     handleOptionClick(field) {
-        this.setState({field}, this.comparatorCallback);
+        this.setState({field}, this.comparator.eval());
     }
-    
+
     render() {
         return (
             <div className="order-bar">
                 Order by: &nbsp;
-                <OrderOption name="Creation Date" field="created_at" selected={this.state.field} handler={_.bind(this.handleOptionClick, this)}/>
-                <OrderOption name="Description" field="description" selected={this.state.field} handler={_.bind(this.handleOptionClick, this)}/>
-                <OrderOption name="Priority" field="priority" selected={this.state.field} handler={_.bind(this.handleOptionClick, this)}/>
+                <OrderOption name="Creation Date" field="created_at" selected={this.state.field} handler={this.handleOptionClick}/>
+                <OrderOption name="Description" field="description" selected={this.state.field} handler={this.handleOptionClick}/>
+                <OrderOption name="Priority" field="priority" selected={this.state.field} handler={this.handleOptionClick}/>
             </div>
         );
     }

@@ -7,14 +7,14 @@ let TodoActions = {
 			data: item
 		});
 	},
-	
+
 	removeItem(id) {
 		dispatcher.handleViewAction({
 			type: 'remove-item',
 			data: id
 		});
 	},
-	
+
 	switchStatus(id) {
 		dispatcher.handleViewAction({
 			type: 'switch-status',

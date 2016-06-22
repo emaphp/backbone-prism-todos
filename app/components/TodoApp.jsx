@@ -4,17 +4,17 @@ import FilteredTodoList from './FilteredTodoList.jsx';
 import todoStore from '../stores/TodoStore';
 
 class TodoApp extends React.Component {
-	componentDidMount() {
-		// Fetch tasks from local storage
+	  componentDidMount() {
+		    // Fetch tasks from local storage
         todoStore.fetch({
             success() {
                 // Initialize children views
-                todoStore.start();
+                todoStore.publish();
             }
         });
-	}
-	
-	render() {
+	  }
+
+	  render() {
         return (
             <div className="columns">
                 <TodoForm />

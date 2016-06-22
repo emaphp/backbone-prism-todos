@@ -1,17 +1,15 @@
 import React from 'react';
-import Prism from 'backbone.prism';
+import Prism from '../backbone.prism';
 import Todo from './Todo.jsx';
 
 class TodoList extends React.Component {
-	render() {
-		if (!this.props.view.isInitialized()) {
-			return (
-                <div className="blankslate">
-					Loading data...
-                </div>
+	  render() {
+		    if (!this.props.view.isInitialized()) {
+			      return (
+                <div className="blankslate">Loading data...</div>
             );
-		}
-		
+		    }
+
         if (this.props.view.length === 0) {
             return (
                 <div className="blankslate">
@@ -25,14 +23,12 @@ class TodoList extends React.Component {
             return <Todo key={model.cid} model={model} />
         };
 
-		let values = this.props.values();
-		
         return (
             <div>
-                {values.view.map(renderer)}
+                {this.props.view.map(renderer)}
             </div>
         );
     }
 }
 
-export default Prism.compose(React, TodoList);
+export default Prism.compose(TodoList, ['view']);

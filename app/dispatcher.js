@@ -1,2 +1,2 @@
-import Prism from 'backbone.prism';
+import Prism from './backbone.prism';
 export default new Prism.Dispatcher();

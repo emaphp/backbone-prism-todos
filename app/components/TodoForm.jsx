@@ -1,31 +1,34 @@
 import React from 'react';
 import TodoActions from '../actions/TodoActions';
-import _ from 'underscore';
 
 class TodoForm extends React.Component {
-	constructor(props) {
-		super(props);
-		
-		this.state = {
-			description: '',
-			priority: 1
-		};
-	}
-	
-	handleInputDescription(e) {
-        let value = $(e.target).val();
+	  constructor(props) {
+		    super(props);
+
+		    this.state = {
+			      description: '',
+			      priority: 1
+		    };
+
+        this.handleInputDescription = this.handleInputDescription.bind(this);
+        this.handleSelectPriority = this.handleSelectPriority.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+	  }
+
+	  handleInputDescription(e) {
+        let value = e.target.value;
         this.setState({
             description: value
         });
     }
-    
+
     handleSelectPriority(e) {
-        let value = $(e.target).val();
+        let value = e.target.value;
         this.setState({
             priority: value
         });
     }
-    
+
     handleSubmit(e) {
         e.preventDefault();
 
@@ -42,24 +45,24 @@ class TodoForm extends React.Component {
 
         TodoActions.addItem(item);
         this.setState({
-			description: '',
-			priority: 1
-		});
+			      description: '',
+			      priority: 1
+		    });
     }
-    
+
     render() {
         return (
             <div className="one-third column">
                 <h2 className="form-title">New Task</h2>
-                <form onSubmit={_.bind(this.handleSubmit, this)}>
+                <form onSubmit={this.handleSubmit}>
                     <dl className="form">
                         <dt><label>Description</label></dt>
-                        <dd><input type="text" className="textfield" placeholder="Task Description" value={this.state.description} onChange={_.bind(this.handleInputDescription, this)}/></dd>
+                        <dd><input type="text" className="textfield" placeholder="Task Description" value={this.state.description} onChange={this.handleInputDescription}/></dd>
                     </dl>
                     <dl className="form">
                         <dt><label>Priority</label></dt>
                         <dd>
-                            <select value={this.state.priority} onChange={_.bind(this.handleSelectPriority, this)}>
+                            <select value={this.state.priority} onChange={this.handleSelectPriority}>
                                 <option value="1">Low</option>
                                 <option value="2">Normal</option>
                                 <option value="3">High</option>
